@@ -1,0 +1,144 @@
+:root {
+  --bg-color: #1a1a2e;
+  --card-bg: #16213e;
+  --accent: #e94560;
+  --text: #ffffff;
+  --text-secondary: #a9a9b3;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 20px;
+}
+
+/* Layout de dos columnas */
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tarjetas */
+.card {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.card h2 {
+  margin-top: 0;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Formulario */
+.input-group {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #0f3460;
+  color: white;
+}
+
+button {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.error-msg {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+/* Tabla */
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stock-table th {
+  text-align: left;
+  color: var(--text-secondary);
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.stock-table td {
+  padding: 15px 0;
+  border-bottom: 1px solid #2a2a40;
+}
+
+.symbol {
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.price {
+  font-family: monospace;
+  font-size: 1.1rem;
+}
+
+.delete-btn {
+  background-color: transparent;
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+.delete-btn:hover {
+  background-color: #ff6b6b;
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 20px;
+}
