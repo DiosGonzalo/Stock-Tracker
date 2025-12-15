@@ -14,10 +14,9 @@ function StockForm({ onStockAdded }) {
     setError('')
 
     try {
-      // Llamamos a TU backend
       await axios.post('/api/portfolio', { symbol: symbol })
-      setSymbol('') // Limpiamos el input
-      onStockAdded() // Avisamos al padre para que recargue la lista
+      setSymbol('')
+      onStockAdded()
     } catch (err) {
       setError('Error: Acción no encontrada o ya existe.')
     } finally {
@@ -26,24 +25,25 @@ function StockForm({ onStockAdded }) {
   }
 
   return (
-    <div className="card form-card">
-      <h2>Añadir Acción</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="input-group">
-          <input
-            type="text"
-            value={symbol}
-            onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-            placeholder="Ej: AAPL, TSLA, GOOGL"
-            disabled={loading}
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? 'Buscando...' : 'Añadir'}
-          </button>
-        </div>
-        {error && <p className="error-msg">{error}</p>}
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="stacked-form">
+      <label className="input-label" htmlFor="symbol">
+        Símbolo
+      </label>
+      <div className="input-group">
+        <input
+          id="symbol"
+          type="text"
+          value={symbol}
+          onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+          placeholder="Ej: AAPL, TSLA, GOOGL"
+          disabled={loading}
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? 'Buscando...' : 'Añadir'}
+        </button>
+      </div>
+      {error && <p className="error-msg">{error}</p>}
+    </form>
   )
 }
 

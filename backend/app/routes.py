@@ -1,17 +1,18 @@
 from flask import Blueprint, jsonify, request
-from .services import get_stock_data
+from .services import get_country_stock_data, get_stock_data, get_multiple_stock_data, get_webSocket, paint_sock
 from .extensions import db
+import pandas as pd
 from .models import Stock
 from sqlalchemy.exc import IntegrityError
 
 main = Blueprint('main', __name__)
 
-# --- RUTA 1: Estado del servidor ---
+
 @main.route('/api/status', methods=['GET'])
 def status():
     return jsonify({"status": "online", "message": "API funcionando"})
 
-# --- RUTA 2: Buscar precio (Para el formulario) ---
+
 @main.route('/api/quote/<symbol>', methods=['GET'])
 def get_quote(symbol):
     data = get_stock_data(symbol)
@@ -19,7 +20,11 @@ def get_quote(symbol):
         return jsonify({"error": "Stock not found"}), 404
     return jsonify(data)
 
-# --- RUTA 3: LEER Portafolio (ESTA ES LA QUE TE FALTA) ---
+@main.route('/api/countryStocks/<country>', methods=['GET'])
+def get_country_stock(country):
+    data = get_country_stock_data(country)
+    return jsonify(data)
+
 @main.route('/api/portfolio', methods=['GET'])
 def get_portfolio():
     try:
@@ -27,7 +32,6 @@ def get_portfolio():
         portfolio_data = []
         
         for stock in saved_stocks:
-            # Buscamos precio en vivo
             live_data = get_stock_data(stock.symbol)
             
             if live_data:
@@ -46,7 +50,6 @@ def get_portfolio():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# --- RUTA 4: GUARDAR en Portafolio ---
 @main.route('/api/portfolio', methods=['POST'])
 def add_to_portfolio():
     data = request.get_json()
@@ -55,7 +58,6 @@ def add_to_portfolio():
     if not symbol:
         return jsonify({"error": "Symbol is required"}), 400
 
-    # Verificar si ya existe para evitar el error de Integridad
     existing = Stock.query.filter_by(symbol=symbol.upper()).first()
     if existing:
         return jsonify({"message": "Ya existe"}), 409
@@ -77,7 +79,6 @@ def add_to_portfolio():
         db.session.rollback()
         return jsonify({"error": "Stock already in portfolio"}), 409
 
-# --- RUTA 5: BORRAR ---
 @main.route('/api/portfolio/<int:id>', methods=['DELETE'])
 def remove_from_portfolio(id):
     stock = Stock.query.get(id)
@@ -87,3 +88,23 @@ def remove_from_portfolio(id):
     db.session.delete(stock)
     db.session.commit()
     return jsonify({"message": "Stock removed"})
+
+@main.route('/api/webSocket/<symbol>', methods=['GET'])
+def start_websocket(symbol):
+    from threading import Thread
+    thread = Thread(target=get_webSocket, args=(symbol,))
+    thread.start()
+    return jsonify({"message": f"WebSocket started for {symbol}"}), 200
+
+@main.route('/api/chart/<symbol>', methods=['GET'])
+def get_stock_chart(symbol):
+    from datetime import datetime, timedelta
+    end_date = datetime.now().strftime('%Y-%m-%d')
+    start_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
+    
+    chart_data = paint_sock(symbol, start_date, end_date)
+    if chart_data:
+        return jsonify({"image": chart_data, "symbol": symbol}), 200
+    else:
+        return jsonify({"error": "Could not generate chart"}), 500
+

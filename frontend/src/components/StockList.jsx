@@ -1,15 +1,14 @@
 import axios from 'axios'
 
 function StockList({ stocks, onDelete }) {
-  
   const handleDelete = async (id) => {
-    if(!window.confirm("¿Seguro que quieres eliminarla?")) return;
-    
+    if (!window.confirm('¿Seguro que quieres eliminarla?')) return
+
     try {
       await axios.delete(`/api/portfolio/${id}`)
-      onDelete() // Recargamos la lista
+      onDelete()
     } catch (error) {
-      console.error("Error eliminando", error)
+      console.error('Error eliminando', error)
     }
   }
 
@@ -18,28 +17,26 @@ function StockList({ stocks, onDelete }) {
   }
 
   return (
-    <div className="card">
-      <h2>Mi Portafolio</h2>
+    <div className="table-scroll">
       <table className="stock-table">
         <thead>
           <tr>
             <th>Símbolo</th>
             <th>Precio</th>
             <th>Moneda</th>
-            <th>Acciones</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {stocks.map((stock) => (
             <tr key={stock.id}>
               <td className="symbol">{stock.symbol}</td>
-              <td className="price">${stock.price?.toFixed(2)}</td>
-              <td>{stock.currency}</td>
+              <td className="price">{stock.price ? `$${stock.price.toFixed(2)}` : '—'}</td>
               <td>
-                <button 
-                  className="delete-btn" 
-                  onClick={() => handleDelete(stock.id)}
-                >
+                <span className="chip">{stock.currency}</span>
+              </td>
+              <td>
+                <button className="delete-btn" onClick={() => handleDelete(stock.id)}>
                   Eliminar
                 </button>
               </td>
