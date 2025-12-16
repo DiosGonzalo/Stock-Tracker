@@ -1,9 +1,12 @@
 from flask import Flask
 from .extensions import db, migrate 
+from flask_cors import CORS
 from .models import Stock
 
 def create_app():
     app = Flask(__name__)
+    
+    CORS(app)
     
     
     app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///app.db'

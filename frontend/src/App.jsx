@@ -71,7 +71,8 @@ function App() {
     () =>
       new Date().toLocaleDateString('es-ES', {
         day: '2-digit',
-        month: 'short',
+        month: 'long',
+        year: 'numeric'
       }),
     []
   )
@@ -80,95 +81,94 @@ function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-dot" />
-          <div>
-            <p className="eyebrow">Panel</p>
-            <h1>Stock Tracker</h1>
-          </div>
+          <div className="logo-square">ST</div>
+          <h1>StockTracker</h1>
         </div>
 
         <nav className="nav">
-          <button
-            className={`nav-item ${activeView === 'list' ? 'active' : ''}`}
-            onClick={() => setActiveView('list')}
-          >
-            Lista stocks
-          </button>
+          <p className="nav-label">Menú Principal</p>
           <button
             className={`nav-item ${activeView === 'portfolio' ? 'active' : ''}`}
             onClick={() => setActiveView('portfolio')}
           >
-            Mis stocks
+            Mi Portafolio
+          </button>
+          <button
+            className={`nav-item ${activeView === 'list' ? 'active' : ''}`}
+            onClick={() => setActiveView('list')}
+          >
+            Explorar Mercado
           </button>
           <button
             className={`nav-item ${activeView === 'live' ? 'active' : ''}`}
             onClick={() => setActiveView('live')}
           >
-            Precio en vivo
-          </button>
-          <button className="nav-item muted" type="button" disabled>
-            Alertas (pronto)
+            Cotización en Vivo
           </button>
         </nav>
 
-        <div className="sidebar-hint">
-          <p>Gestiona tus símbolos y mantén el pulso del mercado desde un solo lugar.</p>
-          <span className="pill">En vivo</span>
+        <div className="sidebar-footer">
+          <div className="user-profile">
+            <div className="avatar">U</div>
+            <div className="user-info">
+              <span className="user-name">Usuario Pro</span>
+              <span className="user-plan">Plan Gratuito</span>
+            </div>
+          </div>
         </div>
       </aside>
 
       <main className="content">
         <header className="page-header">
           <div>
-            <p className="eyebrow">Actualizado {lastUpdated}</p>
-            <h2>Tu hub bursátil</h2>
+            <h2>Dashboard Financiero</h2>
             <p className="muted">
-              Cambia entre vistas, añade nuevos símbolos y controla tu portafolio.
+              Datos actualizados al {lastUpdated}
             </p>
           </div>
           <div className="header-actions">
             <button
-              className="ghost-btn"
+              className="btn-secondary"
               type="button"
               onClick={fetchPortfolio}
               disabled={loading}
             >
-              {loading ? 'Actualizando...' : 'Refrescar datos'}
+              {loading ? 'Sincronizando...' : 'Actualizar Datos'}
             </button>
           </div>
         </header>
 
-        <section className="cards-grid">
-          <div className="card stat-card highlight">
-            <div className="stat-label">En seguimiento</div>
+        {/* Sección de Métricas */}
+        <section className="stats-row">
+          <div className="card stat-card">
+            <div className="stat-label">Total Activos</div>
             <div className="stat-value">{summary.total}</div>
-            <div className="stat-sub">acciones guardadas</div>
           </div>
 
           <div className="card stat-card">
-            <div className="stat-label">Precio medio</div>
+            <div className="stat-label">Valor Promedio</div>
             <div className="stat-value">
               {summary.avg ? `$${summary.avg.toFixed(2)}` : '—'}
             </div>
-            <div className="stat-sub">promedio de los símbolos cargados</div>
           </div>
 
-          <div className="card form-card">
-            <h2>Añadir acción</h2>
+          <div className="card form-card-compact">
+            <h3>Añadir rápida</h3>
             <StockForm onStockAdded={fetchPortfolio} />
           </div>
         </section>
 
+        {/* Sección Principal de Datos */}
         <section className="card data-card">
-          <div className="card-header">
-            <div>
-              <p className="eyebrow">{activeView === 'list' ? 'Mercado seguido' : activeView === 'portfolio' ? 'Tu cartera' : 'En directo'}</p>
-              <h3>{activeView === 'list' ? 'Lista stocks' : activeView === 'portfolio' ? 'Mis stocks' : 'Precio en vivo'}</h3>
+          <div className="card-header-row">
+            <div className="tabs">
+               <h3>{activeView === 'list' ? 'Explorador de Mercado' : activeView === 'portfolio' ? 'Mis Inversiones' : 'Tiempo Real'}</h3>
             </div>
+            
             <div className="header-controls">
               {activeView === 'list' && (
                 <select
-                  className="country-select"
+                  className="minimal-select"
                   value={selectedCountry}
                   onChange={(e) => setSelectedCountry(e.target.value)}
                 >
@@ -179,19 +179,18 @@ function App() {
                   ))}
                 </select>
               )}
-              {activeView !== 'live' && (
-                <span className="pill subtle">{(activeView === 'list' ? assets.length : stocks.length)} activos</span>
-              )}
             </div>
           </div>
 
-          {activeView === 'list' ? (
-            <StockList stocks={assets} onDelete={fetchPortfolio} />
-          ) : activeView === 'portfolio' ? (
-            <StockList stocks={stocks} onDelete={fetchPortfolio} />
-          ) : (
-            <LiveTicker portfolio={stocks} />
-          )}
+          <div className="table-wrapper">
+            {activeView === 'list' ? (
+              <StockList stocks={assets} onDelete={fetchPortfolio} />
+            ) : activeView === 'portfolio' ? (
+              <StockList stocks={stocks} onDelete={fetchPortfolio} />
+            ) : (
+              <LiveTicker portfolio={stocks} />
+            )}
+          </div>
         </section>
       </main>
     </div>
