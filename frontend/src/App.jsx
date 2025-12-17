@@ -3,6 +3,8 @@ import axios from 'axios'
 import StockForm from './components/StockForm'
 import StockList from './components/StockList'
 import LiveTicker from './components/LiveTicker'
+import Login from './components/Login'
+import Register from './components/Register'
 import './App.css'
 
 function App() {
@@ -11,6 +13,8 @@ function App() {
   const [activeView, setActiveView] = useState('portfolio')
   const [loading, setLoading] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState('EUROPE')
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'))
+  const [authView, setAuthView] = useState('login') // 'login' or 'register'
 
   const countries = [
     { code: 'EUROPE', label: 'Europa' },
@@ -35,6 +39,22 @@ function App() {
     }
   }
 
+  const handleLogin = async () => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      setIsAuthenticated(true)
+      await fetchPortfolio()
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    delete axios.defaults.headers.common['Authorization']
+    setIsAuthenticated(false)
+    setStocks([])
+  }
+
   const fetchAssets = async (country = selectedCountry) => {
     try {
       setLoading(true)
@@ -49,7 +69,13 @@ function App() {
   }
 
   useEffect(() => {
-    fetchPortfolio()
+    // If a token is present, set header and fetch portfolio
+    const token = localStorage.getItem('token')
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      fetchPortfolio()
+      setIsAuthenticated(true)
+    }
   }, [])
 
   useEffect(() => {
@@ -119,6 +145,16 @@ function App() {
       </aside>
 
       <main className="content">
+        {!isAuthenticated ? (
+          <div className="centered-card">
+            {authView === 'login' ? (
+              <Login onLogin={handleLogin} onNavigate={setAuthView} />
+            ) : (
+              <Register onLogin={handleLogin} />
+            )}
+          </div>
+        ) : (
+        <>
         <header className="page-header">
           <div>
             <h2>Dashboard Financiero</h2>
@@ -134,6 +170,9 @@ function App() {
               disabled={loading}
             >
               {loading ? 'Sincronizando...' : 'Actualizar Datos'}
+            </button>
+            <button className="btn-ghost" onClick={handleLogout} style={{marginLeft:8}}>
+              Cerrar sesión
             </button>
           </div>
         </header>
@@ -192,6 +231,8 @@ function App() {
             )}
           </div>
         </section>
+        </>
+        )}
       </main>
     </div>
   )
