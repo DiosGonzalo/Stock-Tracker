@@ -50,7 +50,6 @@ def get_multiple_stock_data(tickers):
 def get_country_stock_data(country_code):
     result = []
     try:
-        # Obtener símbolos para el mercado (por defecto 'EUROPE')
         country_key = country_code.upper() if country_code.upper() in COUNTRY_SYMBOLS else 'EUROPE'
         symbols = COUNTRY_SYMBOLS.get(country_key, [])
         
@@ -102,13 +101,11 @@ def paint_sock(stock_symbol, start_date, end_date):
         plt.grid(True, alpha=0.2, color='#94a3b8')
         plt.tight_layout()
         
-        # Set background colors
         fig = plt.gcf()
         fig.patch.set_facecolor('#0a0f1f')
         ax = plt.gca()
         ax.set_facecolor('#0e1429')
         
-        # Save to BytesIO and encode as base64
         buffer = BytesIO()
         plt.savefig(buffer, format='png', facecolor='#0a0f1f', edgecolor='none', dpi=100)
         buffer.seek(0)

@@ -15,13 +15,13 @@ function Register({ onLogin }) {
     setLoading(true)
     try {
       await axios.post('/api/register', { username, password })
-      // Auto-login after successful register
       const resp = await axios.post('/api/login', { username, password })
       const { access_token } = resp.data
       if (access_token) {
         localStorage.setItem('token', access_token)
+        localStorage.setItem('username', username)
         axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-        onLogin()
+        onLogin && onLogin(username)
       } else {
         setError('Registro correcto pero no se pudo iniciar sesión automáticamente')
       }

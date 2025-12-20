@@ -15,6 +15,7 @@ function App() {
   const [selectedCountry, setSelectedCountry] = useState('EUROPE')
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'))
   const [authView, setAuthView] = useState('login') // 'login' or 'register'
+  const [username, setUsername] = useState(localStorage.getItem('username') || '')
 
   const countries = [
     { code: 'EUROPE', label: 'Europa' },
@@ -39,8 +40,10 @@ function App() {
     }
   }
 
-  const handleLogin = async () => {
+  const handleLogin = async (usernameArg) => {
     const token = localStorage.getItem('token')
+    // If the login callback provided a username, persist it in state
+    if (usernameArg) setUsername(usernameArg)
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       setIsAuthenticated(true)
@@ -69,13 +72,14 @@ function App() {
   }
 
   useEffect(() => {
-    // If a token is present, set header and fetch portfolio
     const token = localStorage.getItem('token')
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       fetchPortfolio()
       setIsAuthenticated(true)
     }
+    const stored = localStorage.getItem('username')
+    if (stored) setUsername(stored)
   }, [])
 
   useEffect(() => {
@@ -135,10 +139,10 @@ function App() {
 
         <div className="sidebar-footer">
           <div className="user-profile">
-            <div className="avatar">U</div>
+            <div className="avatar">{username ? username.charAt(0).toUpperCase() : 'U'}</div>
             <div className="user-info">
-              <span className="user-name">Usuario Pro</span>
-              <span className="user-plan">Plan Gratuito</span>
+              <span className="user-name">{username || 'Usuario'}</span>
+             
             </div>
           </div>
         </div>
@@ -157,7 +161,7 @@ function App() {
         <>
         <header className="page-header">
           <div>
-            <h2>Dashboard Financiero</h2>
+            <h2>{activeView === 'list' ? 'Explorador de Mercado' : activeView === 'portfolio' ? 'Dashboard Financiero' : 'Cotización en Vivo'}</h2>
             <p className="muted">
               Datos actualizados al {lastUpdated}
             </p>
@@ -177,7 +181,6 @@ function App() {
           </div>
         </header>
 
-        {/* Sección de Métricas */}
         <section className="stats-row">
           <div className="card stat-card">
             <div className="stat-label">Total Activos</div>
@@ -197,7 +200,6 @@ function App() {
           </div>
         </section>
 
-        {/* Sección Principal de Datos */}
         <section className="card data-card">
           <div className="card-header-row">
             <div className="tabs">

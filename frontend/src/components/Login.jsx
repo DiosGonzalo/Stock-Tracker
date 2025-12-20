@@ -18,8 +18,9 @@ function Login({ onLogin, onNavigate }) {
       const { access_token } = resp.data
       if (access_token) {
         localStorage.setItem('token', access_token)
+        localStorage.setItem('username', username)
         axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-        onLogin()
+        onLogin && onLogin(username)
       } else {
         setError('Respuesta inválida del servidor')
       }
